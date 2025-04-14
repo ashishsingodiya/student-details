@@ -59,22 +59,22 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-      // Fetch users from API
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/users");
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users);
-      } else {
-        showNotification("Failed to fetch users", "error");
+    // Fetch users from API
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/admin/users");
+        if (res.ok) {
+          const data = await res.json();
+          setUsers(data.users);
+        } else {
+          showNotification("Failed to fetch users", "error");
+        }
+      } catch (error) {
+        showNotification("Error fetching users", "error");
       }
-    } catch (error) {
-      showNotification("Error fetching users", "error");
-    }
-    setLoading(false);
-  };
+      setLoading(false);
+    };
     fetchUsers();
   }, []);
 
@@ -155,8 +155,8 @@ const Dashboard = () => {
               <button
                 key={filterOption}
                 className={`px-3 py-2 rounded border border-gray-300 text-gray-700 transition-colors duration-300 cursor-pointer text-sm sm:text-base ${selectedFilter === filterOption
-                    ? "bg-blue-500 text-white"
-                    : "bg-white hover:bg-gray-100"
+                  ? "bg-blue-500 text-white"
+                  : "bg-white hover:bg-gray-100"
                   }`}
                 onClick={() => setSelectedFilter(filterOption)}
               >

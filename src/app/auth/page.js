@@ -34,7 +34,7 @@ function AuthContent() {
             className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
             onClick={() => setMode("signup")}
           >
-            Don't have an account? Signup
+            Don&apos;t have an account? Signup
           </p>
         )}
         {mode === "signup" && (
@@ -70,9 +70,6 @@ export default function AuthPage() {
     </div>
   );
 }
-
-// ... keep your LoginForm, SignUpForm, and ResetPasswordForm components as they are
-
 
 function LoginForm({ onForgotPassword }) {
     const [email, setEmail] = useState("");

@@ -59,6 +59,22 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+      // Fetch users from API
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users);
+      } else {
+        showNotification("Failed to fetch users", "error");
+      }
+    } catch (error) {
+      showNotification("Error fetching users", "error");
+    }
+    setLoading(false);
+  };
     fetchUsers();
   }, []);
 

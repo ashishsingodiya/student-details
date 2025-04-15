@@ -20,6 +20,10 @@ export default function StudentPortal() {
     router.push("/auth?mode=login");
   };
 
+  const handleAdminLogin = () => {
+    router.push("/admin/login");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white">
       {/* Hero Section */}
@@ -39,21 +43,29 @@ export default function StudentPortal() {
           Ignite your learning journey with tools, community, and inspiration.
         </p>
         <div
-          className={`flex flex-col sm:flex-row gap-4 transition-all duration-1000 delay-400 ${
+          className={`flex flex-col gap-4 transition-all duration-1000 delay-400 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={handleSignUp}
+              className="bg-green-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
+            >
+              Join
+            </button>
+            <button
+              onClick={handleSignIn}
+              className="bg-blue-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
+            >
+              Log In
+            </button>
+          </div>
           <button
-            onClick={handleSignUp}
-            className="bg-green-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
+            onClick={handleAdminLogin}
+            className="bg-purple-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
           >
-            Join
-          </button>
-          <button
-            onClick={handleSignIn}
-            className="bg-blue-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
-          >
-            Log In
+            Admin Login
           </button>
         </div>
       </section>

@@ -61,22 +61,6 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Fetch users from API
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/admin/users");
-        if (res.ok) {
-          const data = await res.json();
-          setUsers(data.users);
-        } else {
-          showNotification("Failed to fetch users", "error");
-        }
-      } catch (error) {
-        showNotification("Error fetching users", "error");
-      }
-      setLoading(false);
-    };
     fetchUsers();
   }, []);
 
@@ -86,6 +70,11 @@ const Dashboard = () => {
     setTimeout(() => {
       setNotification(null);
     }, 3000);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    router.push("/");
   };
 
   // Filter users based on search and selected filter
@@ -137,9 +126,17 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white flex items-center justify-center p-4 sm:p-6">
       <div className="bg-white p-6 rounded-xl shadow-md w-full h-full max-w-[calc(200vw-200px)] max-h-[calc(200vh-200px)] mx-auto my-auto text-center">
         <div className="w-full max-w-full sm:max-w-6xl">
-          <h1 className="text-xl sm:text-2xl font-bold mb-4 text-gray-700">
-            Admin Dashboard - User Management
-          </h1>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-700">
+              Admin Dashboard - User Management
+            </h1>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 rounded text-white transition-colors duration-300 bg-red-500 hover:bg-red-600 cursor-pointer text-sm sm:text-base"
+            >
+              Logout
+            </button>
+          </div>
 
           {/* Notification */}
           {notification && (
@@ -220,7 +217,7 @@ const Dashboard = () => {
                               <button
                                 onClick={() => updateUserStatus(user.email, "approve")}
                                 disabled={updatingUser === user.email}
-                                className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-green-600 hover:bg-green-500 cursor-pointer disabled:opacity-50 text-sm"
+                                className="px-2 py-1 w-auto rounded text-white transition Colors duration-300 bg-green-600 hover:bg-green-500 cursor-pointer disabled:opacity-50 text-sm"
                               >
                                 {updatingUser === user.email ? (
                                   <div className="flex justify-center">

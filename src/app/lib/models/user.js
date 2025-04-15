@@ -10,7 +10,7 @@ const UserSchema = new mongoose.Schema({
   isProfileDone: { type: Boolean, default: false },
   status: {
     type: String,
-    enum: ["pending", "approved", "rejected"],
+    enum: ["pending", "approved", "rejected", "Blocked"],
     default: "pending"
   },
   name: { type: String },
@@ -50,6 +50,10 @@ export async function getAllUsers() {
     console.error("Error getting all users:", error);
     throw error;
   }
+}
+
+export async function deleteUser(email) {
+  await User.deleteOne({ email });
 }
 
 export default User;

@@ -38,7 +38,7 @@ const Dashboard = () => {
   const [search, setSearch] = useState(""); // Search query
   const [selectedUser, setSelectedUser] = useState(null); // For modal details
   const [loading, setLoading] = useState(false); // Loading for fetching users
-  const [selectedFilter, setSelectedFilter] = useState("All"); // "All" | "Pending" | "Approved" | "Rejected"
+  const [selectedFilter, setSelectedFilter] = useState("All"); // "All" | "Pending" | "Approved" | "Rejected" | "Blocked"
   const [notification, setNotification] = useState(null); // { message: string, type: 'success'|'error' }
   const [updatingUser, setUpdatingUser] = useState(null); // email currently being updated
   const router = useRouter();
@@ -92,27 +92,34 @@ const Dashboard = () => {
       matchesFilter = user.status === "approved";
     } else if (selectedFilter === "Rejected") {
       matchesFilter = user.status === "rejected";
+    } else if (selectedFilter === "Blocked") {
+      matchesFilter = user.status === "blocked";
     }
     return matchesSearch && matchesFilter;
   });
 
   // Update a user's status and provide feedback
-  const updateUserStatus = async (email, newStatus) => {
+  const updateUserStatus = async (email, action) => {
     setUpdatingUser(email);
     try {
       const res = await fetch("/api/admin/update-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, action: newStatus }),
+        body: JSON.stringify({ email, action }),
       });
 
       if (res.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.email === email ? { ...user, status: newStatus } : user
-          )
-        );
-        showNotification(`User updated successfully!`);
+        if (action === "delete") {
+          setUsers((prevUsers) => prevUsers.filter((user) => user.email !== email));
+          showNotification("User deleted successfully!");
+        } else {
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user.email === email ? { ...user, status: action } : user
+            )
+          );
+          showNotification(`User updated successfully!`);
+        }
       } else {
         showNotification("Failed to update user status", "error");
       }
@@ -150,7 +157,7 @@ const Dashboard = () => {
 
           {/* Filter Options */}
           <div className="mb-4 flex flex-wrap gap-2 sm:space-x-4">
-            {["All", "Pending", "Approved", "Rejected"].map((filterOption) => (
+            {["All", "Pending", "Approved", "Rejected", "Blocked"].map((filterOption) => (
               <button
                 key={filterOption}
                 className={`px-3 py-2 rounded border border-gray-300 text-gray-700 transition-colors duration-300 cursor-pointer text-sm sm:text-base ${selectedFilter === filterOption
@@ -193,9 +200,7 @@ const Dashboard = () => {
                     <th className="px-4 py-2 border text-gray-700 text-sm">Name</th>
                     <th className="px-4 py-2 border text-gray-700 text-sm">Roll No</th>
                     <th className="px-4 py-2 border text-gray-700 text-sm">Status</th>
-                    {selectedFilter !== "All" && (
-                      <th className="px-4 py-2 border text-gray-700 text-sm">Actions</th>
-                    )}
+                    <th className="px-4 py-2 border text-gray-700 text-sm">Actions</th>
                     <th className="px-4 py-2 border text-gray-700 text-sm">Details</th>
                   </tr>
                 </thead>
@@ -210,54 +215,24 @@ const Dashboard = () => {
                           ? user.status.charAt(0).toUpperCase() + user.status.slice(1)
                           : "Unknown"}
                       </td>
-                      {selectedFilter !== "All" && (
-                        <td className="px-4 py-2 border space-x-2">
-                          {selectedFilter === "Pending" && (
-                            <>
-                              <button
-                                onClick={() => updateUserStatus(user.email, "approve")}
-                                disabled={updatingUser === user.email}
-                                className="px-2 py-1 w-auto rounded text-white transition Colors duration-300 bg-green-600 hover:bg-green-500 cursor-pointer disabled:opacity-50 text-sm"
-                              >
-                                {updatingUser === user.email ? (
-                                  <div className="flex justify-center">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                  </div>
-                                ) : (
-                                  "Approve"
-                                )}
-                              </button>
-                              <button
-                                onClick={() => updateUserStatus(user.email, "reject")}
-                                disabled={updatingUser === user.email}
-                                className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
-                              >
-                                {updatingUser === user.email ? (
-                                  <div className="flex justify-center">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                  </div>
-                                ) : (
-                                  "Reject"
-                                )}
-                              </button>
-                            </>
-                          )}
-                          {selectedFilter === "Approved" && (
-                            <button
-                              onClick={() => updateUserStatus(user.email, "reject")}
-                              disabled={updatingUser === user.email}
-                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
-                            >
-                              {updatingUser === user.email ? (
-                                <div className="flex justify-center">
-                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                </div>
-                              ) : (
-                                "Reject"
-                              )}
-                            </button>
-                          )}
-                          {selectedFilter === "Rejected" && (
+                      <td className="px-4 py-2 border space-x-2">
+                        {selectedFilter === "All" && (
+                          <button
+                            onClick={() => updateUserStatus(user.email, "delete")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Delete"
+                            )}
+                          </button>
+                        )}
+                        {selectedFilter === "Pending" && (
+                          <>
                             <button
                               onClick={() => updateUserStatus(user.email, "approve")}
                               disabled={updatingUser === user.email}
@@ -271,9 +246,110 @@ const Dashboard = () => {
                                 "Approve"
                               )}
                             </button>
-                          )}
-                        </td>
-                      )}
+                            <button
+                              onClick={() => updateUserStatus(user.email, "reject")}
+                              disabled={updatingUser === user.email}
+                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                            >
+                              {updatingUser === user.email ? (
+                                <div className="flex justify-center">
+                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Reject"
+                              )}
+                            </button>
+                            <button
+                              onClick={() => updateUserStatus(user.email, "delete")}
+                              disabled={updatingUser === user.email}
+                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                            >
+                              {updatingUser === user.email ? (
+                                <div className="flex justify-center">
+                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Delete"
+                              )}
+                            </button>
+                          </>
+                        )}
+                        {selectedFilter === "Approved" && (
+                          <>
+                            <button
+                              onClick={() => updateUserStatus(user.email, "block")}
+                              disabled={updatingUser === user.email}
+                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-orange-600 hover:bg-orange-500 cursor-pointer disabled:opacity-50 text-sm"
+                            >
+                              {updatingUser === user.email ? (
+                                <div className="flex justify-center">
+                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Block"
+                              )}
+                            </button>
+                            <button
+                              onClick={() => updateUserStatus(user.email, "delete")}
+                              disabled={updatingUser === user.email}
+                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                            >
+                              {updatingUser === user.email ? (
+                                <div className="flex justify-center">
+                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Delete"
+                              )}
+                            </button>
+                          </>
+                        )}
+                        {selectedFilter === "Rejected" && (
+                          <button
+                            onClick={() => updateUserStatus(user.email, "delete")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Delete"
+                              )}
+                          </button>
+                        )}
+                        {selectedFilter === "Blocked" && (
+                          <>
+                            <button
+                              onClick={() => updateUserStatus(user.email, "unblock")}
+                              disabled={updatingUser === user.email}
+                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-green-600 hover:bg-green-500 cursor-pointer disabled:opacity-50 text-sm"
+                            >
+                              {updatingUser === user.email ? (
+                                <div className="flex justify-center">
+                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Unblock"
+                              )}
+                            </button>
+                            <button
+                              onClick={() => updateUserStatus(user.email, "delete")}
+                              disabled={updatingUser === user.email}
+                              className="px-2 py-1 w-auto rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                            >
+                              {updatingUser === user.email ? (
+                                <div className="flex justify-center">
+                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                              ) : (
+                                "Delete"
+                              )}
+                            </button>
+                          </>
+                        )}
+                      </td>
                       <td className="px-4 py-2 border">
                         <button
                           onClick={() => setSelectedUser(user)}
@@ -302,54 +378,24 @@ const Dashboard = () => {
                           : "Unknown"}
                       </p>
                     </div>
-                    {selectedFilter !== "All" && (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {selectedFilter === "Pending" && (
-                          <>
-                            <button
-                              onClick={() => updateUserStatus(user.email, "approve")}
-                              disabled={updatingUser === user.email}
-                              className="px-2 py-1 rounded text-white transition-colors duration-300 bg-green-600 hover:bg-green-500 cursor-pointer disabled:opacity-50 text-sm"
-                            >
-                              {updatingUser === user.email ? (
-                                <div className="flex justify-center">
-                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                </div>
-                              ) : (
-                                "Approve"
-                              )}
-                            </button>
-                            <button
-                              onClick={() => updateUserStatus(user.email, "reject")}
-                              disabled={updatingUser === user.email}
-                              className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
-                            >
-                              {updatingUser === user.email ? (
-                                <div className="flex justify-center">
-                                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                </div>
-                              ) : (
-                                "Reject"
-                              )}
-                            </button>
-                          </>
-                        )}
-                        {selectedFilter === "Approved" && (
-                          <button
-                            onClick={() => updateUserStatus(user.email, "reject")}
-                            disabled={updatingUser === user.email}
-                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
-                          >
-                            {updatingUser === user.email ? (
-                              <div className="flex justify-center">
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              </div>
-                            ) : (
-                              "Reject"
-                            )}
-                          </button>
-                        )}
-                        {selectedFilter === "Rejected" && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {selectedFilter === "All" && (
+                        <button
+                          onClick={() => updateUserStatus(user.email, "delete")}
+                          disabled={updatingUser === user.email}
+                          className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                        >
+                          {updatingUser === user.email ? (
+                            <div className="flex justify-center">
+                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          ) : (
+                            "Delete"
+                          )}
+                        </button>
+                      )}
+                      {selectedFilter === "Pending" && (
+                        <>
                           <button
                             onClick={() => updateUserStatus(user.email, "approve")}
                             disabled={updatingUser === user.email}
@@ -363,9 +409,110 @@ const Dashboard = () => {
                               "Approve"
                             )}
                           </button>
-                        )}
-                      </div>
-                    )}
+                          <button
+                            onClick={() => updateUserStatus(user.email, "reject")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Reject"
+                            )}
+                          </button>
+                          <button
+                            onClick={() => updateUserStatus(user.email, "delete")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Delete"
+                            )}
+                          </button>
+                        </>
+                      )}
+                      {selectedFilter === "Approved" && (
+                        <>
+                          <button
+                            onClick={() => updateUserStatus(user.email, "block")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-orange-600 hover:bg-orange-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Block"
+                            )}
+                          </button>
+                          <button
+                            onClick={() => updateUserStatus(user.email, "delete")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Delete"
+                            )}
+                          </button>
+                        </>
+                      )}
+                      {selectedFilter === "Rejected" && (
+                        <button
+                          onClick={() => updateUserStatus(user.email, "delete")}
+                          disabled={updatingUser === user.email}
+                          className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                        >
+                          {updatingUser === user.email ? (
+                            <div className="flex justify-center">
+                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          ) : (
+                            "Delete"
+                          )}
+                        </button>
+                      )}
+                      {selectedFilter === "Blocked" && (
+                        <>
+                          <button
+                            onClick={() => updateUserStatus(user.email, "unblock")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-green-600 hover:bg-green-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Unblock"
+                            )}
+                          </button>
+                          <button
+                            onClick={() => updateUserStatus(user.email, "delete")}
+                            disabled={updatingUser === user.email}
+                            className="px-2 py-1 rounded text-white transition-colors duration-300 bg-red-600 hover:bg-red-500 cursor-pointer disabled:opacity-50 text-sm"
+                          >
+                            {updatingUser === user.email ? (
+                              <div className="flex justify-center">
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              </div>
+                            ) : (
+                              "Delete"
+                            )}
+                          </button>
+                        </>
+                      )}
+                    </div>
                     <button
                       onClick={() => setSelectedUser(user)}
                       className="mt-4 w-full py-2 bg-blue-500 hover:bg-blue-600 text-white rounded cursor-pointer transition-colors duration-300 text-sm"

@@ -12,12 +12,16 @@ export default function StudentPortal() {
     setIsVisible(true);
   }, []);
 
-  const handleSignUp = () => {
-    router.push("/auth?mode=signup");
-  };
+  // const handleSignUp = () => {
+  //   router.push("/auth?mode=signup");
+  // };
 
-  const handleSignIn = () => {
-    router.push("/auth?mode=login");
+  // const handleSignIn = () => {
+  //   router.push("/auth?mode=login");
+  // };
+
+  const handleDashboard = () => {
+    router.push("/dashboard");
   };
 
   const handleAdminLogin = () => {
@@ -47,7 +51,7 @@ export default function StudentPortal() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          <div className="flex flex-col sm:flex-row gap-4">
+          {/* <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleSignUp}
               className="bg-green-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
@@ -60,7 +64,13 @@ export default function StudentPortal() {
             >
               Log In
             </button>
-          </div>
+          </div> */}
+          <button
+            onClick={handleDashboard}
+            className="bg-green-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
+          >
+            Go To Student Portal
+          </button>
           <button
             onClick={handleAdminLogin}
             className="bg-purple-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"

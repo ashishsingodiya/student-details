@@ -12,7 +12,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        router.push("/login");
+        router.push("/auth");
         return;
       }
 
@@ -28,11 +28,11 @@ export default function Dashboard() {
         if (res.ok) {
           setUser(data.user);
         } else {
-          router.push("/login");
+          router.push("/auth");
         }
       } catch (err) {
         console.error("Failed to fetch user:", err);
-        router.push("/login");
+        router.push("/auth");
       }
     };
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    router.push("/auth");
+    router.push("/");
   };
 
   if (!user) return <p className="text-center text-black mt-10">Loading...</p>;
@@ -64,20 +64,24 @@ export default function Dashboard() {
           <p><strong>Address:</strong> {user.address || "-"}</p>
         </div>
 
-        {/* ✅ Account Approval Status */}
-        <p
+       {/* ✅ Account Approval Status */}
+       <p
           className={`mb-4 font-semibold ${user.status === "approved"
               ? "text-green-600"
               : user.status === "rejected"
                 ? "text-red-600"
-                : "text-yellow-600"
+                : user.status === "blocked"
+                  ? "text-orange-600"
+                  : "text-yellow-600"
             }`}
         >
           {user.status === "approved"
             ? "✅ Account approved"
             : user.status === "rejected"
               ? "❌ Account rejected"
-              : "⌛ Account approval pending"}
+              : user.status === "blocked"
+                ? "🚫 Account blocked"
+                : "⌛ Account approval pending"}
         </p>
 
         <button

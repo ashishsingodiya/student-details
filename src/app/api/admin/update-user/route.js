@@ -15,7 +15,7 @@ export async function POST(req) {
     await sendMail(email, "Account Rejected ❌", "Sorry, your account request was declined.");
   } else if (action === "block") {
     await updateUser(email, { status: "blocked" });
-    await sendMail(email, "Account Blocked 🚫", "Your account has been blocked. Please contact support for more details.");
+    await sendMail(email, "Account Blocked 🚫", "Your account has been blocked. Please contact your admin for more details.");
   } else if (action === "unblock") {
     await updateUser(email, { status: "approved" });
     await sendMail(email, "Account Unblocked ✅", "Your account has been unblocked and is now approved!");

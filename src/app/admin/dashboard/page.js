@@ -8,7 +8,7 @@ const Modal = ({ user, onClose }) => {
   if (!user) return null;
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-gradient-to-br from-blue-100 to-white p-4">
-      <div className="bg-white p-6 rounded shadow-lg w-full max-w-md sm:w-96">
+      <div className="bg-white p-6 rounded shadow-lg mx-4 w-full max-w-md sm:w-6">
         <h2 className="text-xl font-bold mb-4 text-gray-700 text-center">User Details</h2>
         <div className="space-y-2 text-gray-700">
           <p><strong>Email:</strong> {user.email}</p>
@@ -133,7 +133,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white flex items-center justify-center p-4 sm:p-6">
-      <div className="bg-white p-6 rounded-xl shadow-md w-full h-full max-w-[calc(100vw-200px)] max-h-[calc(200vh-200px)] mx-auto my-auto text-center">
+      <div className="bg-white p-6 rounded-xl shadow-md w-full h-full max-w-[calc(200vw-200px)] max-h-[calc(200vh-200px)] mx-auto my-auto text-center">
         <div className="w-full max-w-full sm:max-w-6xl">
           <h1 className="text-xl sm:text-2xl font-bold mb-4 text-gray-700">
             Admin Dashboard - User Management

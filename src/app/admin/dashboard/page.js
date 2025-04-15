@@ -8,9 +8,10 @@ const Modal = ({ user, onClose }) => {
   if (!user) return null;
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-gradient-to-br from-blue-100 to-white p-4">
-      <div className="bg-white p-6 rounded shadow-lg mx-4 w-full max-w-md sm:w-6">
+      <div className="bg-white p-6 rounded shadow-lg w-full mx-4 sm:mx-6">
         <h2 className="text-xl font-bold mb-4 text-gray-700 text-center">User Details</h2>
-        <div className="space-y-2 text-gray-700">
+        <div className="flex justify-center space-x-2 text-gray-700">
+        <div className="space-y-2 text-gray-700 text-left">
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Name:</strong> {user.name}</p>
           <p><strong>Roll No:</strong> {user.rollNo}</p>
@@ -19,6 +20,7 @@ const Modal = ({ user, onClose }) => {
           <p><strong>Gender:</strong> {user.gender}</p>
           <p><strong>Phone:</strong> {user.phone}</p>
           <p><strong>Address:</strong> {user.address}</p>
+        </div>
         </div>
         <button
           className="mt-4 w-full py-2 rounded text-white transition-colors duration-300 bg-blue-500 hover:bg-blue-600 cursor-pointer"

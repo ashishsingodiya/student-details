@@ -6,69 +6,75 @@ import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from "react-icons/md";
 
 // Child component that uses useSearchParams()
 function AuthContent() {
-  const searchParams = useSearchParams();
-  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
-  const [mode, setMode] = useState(initialMode);
+    const searchParams = useSearchParams();
+    const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+    const [mode, setMode] = useState(initialMode);
 
-  useEffect(() => {
-    const newMode = searchParams.get("mode");
-    if (newMode === "signup" || newMode === "login") {
-      setMode(newMode);
-    }
-  }, [searchParams]);
+    useEffect(() => {
+        const newMode = searchParams.get("mode");
+        if (newMode === "signup" || newMode === "login") {
+            setMode(newMode);
+        }
+    }, [searchParams]);
 
-  return (
-    <>
-      {mode === "login" && (
-        <LoginForm onForgotPassword={() => setMode("reset")} />
-      )}
-      {mode === "signup" && (
-        <SignUpForm onOtpVerified={() => setMode("login")} />
-      )}
-      {mode === "reset" && (
-        <ResetPasswordForm onResetSuccess={() => setMode("login")} />
-      )}
-      <div className="mt-4 text-center">
-        {mode === "login" && (
-          <p
-            className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
-            onClick={() => setMode("signup")}
-          >
-            Don&apos;t have an account? Signup
-          </p>
-        )}
-        {mode === "signup" && (
-          <p
-            className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
-            onClick={() => setMode("login")}
-          >
-            Already have an account? Sign in
-          </p>
-        )}
-        {mode === "reset" && (
-          <p
-            className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
-            onClick={() => setMode("login")}
-          >
-            Back to login
-          </p>
-        )}
-      </div>
-    </>
-  );
+    return (
+        <>
+            {mode === "login" && (
+                <LoginForm onForgotPassword={() => setMode("reset")} />
+            )}
+            {mode === "signup" && (
+                <SignUpForm onOtpVerified={() => setMode("login")} />
+            )}
+            {mode === "reset" && (
+                <ResetPasswordForm onResetSuccess={() => setMode("login")} />
+            )}
+            <div className="mt-4 text-center">
+                {mode === "login" && (
+                    <p
+                        className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
+                        onClick={() => setMode("signup")}
+                    >
+                        Don&apos;t have an account? Signup
+                    </p>
+                )}
+                {mode === "signup" && (
+                    <p
+                        className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
+                        onClick={() => setMode("login")}
+                    >
+                        Already have an account? Sign in
+                    </p>
+                )}
+                {mode === "reset" && (
+                    <p
+                        className="text-gray-500 cursor-pointer hover:text-black hover:underline text-sm"
+                        onClick={() => setMode("login")}
+                    >
+                        Back to login
+                    </p>
+                )}
+            </div>
+        </>
+    );
 }
 
-// Main page component
 export default function AuthPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-white px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 sm:p-8">
-        <Suspense fallback={<div>Loading...</div>}>
-          <AuthContent />
-        </Suspense>
-      </div>
-    </div>
-  );
+    const router = useRouter();
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-white px-4 space-y-6">
+            <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 sm:p-8">
+                <Suspense fallback={<div>Loading...</div>}>
+                    <AuthContent />
+                </Suspense>
+            </div>
+            <button
+                onClick={() => router.push("/")}
+                className="text-gray-600 hover:text-gray-700 hover:bg-gray-200 py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+                Back to Homepage
+            </button>
+        </div>
+    );
 }
 
 function LoginForm({ onForgotPassword }) {

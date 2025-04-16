@@ -69,7 +69,7 @@ export default function StudentPortal() {
             Go To Student Portal
           </button>
           <button
-            onClick={handleAdminLogin}
+             onClick={() => router.push("/signup")}
             className="bg-purple-600 text-white py-3 px-10 rounded-lg text-lg sm:text-xl font-semibold hover:bg-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
           >
             Admin Login
